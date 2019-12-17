@@ -40,10 +40,12 @@ class DiaryController extends Controller
         return redirect()->route('diary.index');
     }
 
-    public function destroy(int $id)
+    public function destroy(Diary $diary)
     {
+        if (Auth::user()->id !== $diary->user_id) {
+            abort(403);
+        }
         //Diaryモデルを使用して、diariesテーブルから$idと一致するidをもつデータを取得
-        $diary = Diary::find($id);
 
         //取得したデータを削除
         $diary->delete();
@@ -51,22 +53,23 @@ class DiaryController extends Controller
         return redirect()->route('diary.index');
     }
 
-    public function edit(int $id)
+    public function edit(Diary $diary)
     {
-        // ddコマンドとは？
-        // var_dump()
-        // die()
-        $diary = Diary::find($id);
-
+         //Diaryモデルを使用して、diariesテーブルから$idと一致するidをもつデータを取得
+        if (Auth::user()->id !== $diary->user_id) {
+            abort(403);
+        }
         return view('diaries.edit', [
             'diary' => $diary,
         ]);
     }
 
     // id, バリデーション
-    public function update(int $id, CreateDiary $request)
+    public function update(Diary $diary, CreateDiary $request)
     {
-        $diary = Diary::find($id);
+        if (Auth::user()->id !== $diary->user_id) {
+            abort(403);
+        }
 
         $diary->title = $request->title; //画面で入力されたタイトルを代入
         $diary->body = $request->body; //画面で入力された本文を代入
